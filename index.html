@@ -1,0 +1,104 @@
+<form>
+      <label for="domain">Domain:</label>
+      <input type="text" id="domain" name="domain"><br>
+
+      <label for="type">Type:</label>
+      <select id="type" name="type">
+        <option value="A">A</option>
+        <option value="MX">MX</option>
+        <option value="CNAME">CNAME</option>
+      </select><br>
+
+      <button type="submit" id="submit-btn">Lookup</button>
+    </form>
+
+    <div id="results"></div>
+
+
+   <script>
+const dnsFetch = async (type, target) => {
+  const res = await fetch(`https://cloudflare-dns.com/dns-query?name=${target}&type=${type}`, {
+    headers: {
+      'accept': 'application/dns-json'
+    }
+  });
+  const data = await res.json();
+  return data;
+}
+
+const form = document.querySelector('form');
+const resultsDiv = document.querySelector('#results');
+
+form.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const domain = document.querySelector('#domain').value;
+  const type = document.querySelector('#type').value;
+
+  const data = await dnsFetch(type, domain);
+
+  resultsDiv.innerHTML = `<p>Results for ${domain} (${type}):</p>`;
+  resultsDiv.innerHTML += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+});
+
+
+   </script>
+
+
+<style>
+
+/* Apply styles to the form element and its child elements */
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px;
+  padding: 20px;
+  background-color: #f1f1f1;
+  border-radius: 10px;
+}
+
+label {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+input[type="text"], select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  margin: 5px 0 20px 0;
+  font-size: 1.2em;
+  background-color: #fff;
+  box-shadow: 0px 1px 5px rgba(0,0,0,0.2);
+}
+
+button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1.2em;
+}
+
+button:hover {
+  background-color: #3e8e41;
+}
+
+#results {
+  margin: 20px;
+  padding: 20px;
+  background-color: #f1f1f1;
+  border-radius: 10px;
+}
+
+pre {
+  font-size: 1.2em;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+</style>
